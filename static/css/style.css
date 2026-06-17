@@ -1,0 +1,398 @@
+/* ============================================================
+   BudgetPal — Custom Styles
+   Minimalist finance theme. Colors carry meaning:
+     Purple  #6C63FF  primary / brand / "today"
+     Teal    #2EC4B6  income / money in / under budget
+     Coral   #FF6B6B  expense / money out / over budget
+     Amber   #FFBE0B  caution / nearing limit
+   ============================================================ */
+
+:root {
+    --brand:   #6C63FF;
+    --brand-d: #5b52e6;
+    --income:  #2EC4B6;
+    --expense: #FF6B6B;
+    --amber:   #FFBE0B;
+    --ink:     #1A1A2E;
+    --ink-2:   #4A4A68;
+    --muted:   #8D99AE;
+    --line:    #ECECF5;
+    --bg:      #F5F6FB;
+    --card:    #FFFFFF;
+    --radius:  18px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink-2);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .page-title, .navbar-brand {
+    font-family: 'Poppins', sans-serif;
+    color: var(--ink);
+}
+
+/* ── Navbar ── */
+.app-navbar {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+    padding: .65rem 0;
+}
+.navbar-brand {
+    font-weight: 800;
+    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+}
+.brand-mark {
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+    background: var(--brand);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 1rem;
+}
+.brand-mark.large { width: 56px; height: 56px; font-size: 1.6rem; border-radius: 16px; }
+.app-navbar .nav-link {
+    color: var(--ink-2);
+    font-weight: 500;
+    font-size: .95rem;
+    padding: .5rem .9rem;
+    border-radius: 10px;
+    margin: 0 .1rem;
+    transition: all .15s;
+}
+.app-navbar .nav-link:hover { background: #F0F0F8; color: var(--ink); }
+.app-navbar .nav-link.active { background: #ECEAFF; color: var(--brand); font-weight: 600; }
+.user-chip { background: #F0F0F8; }
+
+/* ── Page layout ── */
+.page { padding: 2rem 1rem 4rem; max-width: 960px; }
+.page-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.page-title { font-size: 1.9rem; font-weight: 800; margin: 0; }
+.page-sub { color: var(--muted); margin: .15rem 0 0; font-size: .95rem; }
+
+/* ── Month navigation ── */
+.month-nav {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    background: #ECEAFF;
+    padding: .3rem;
+    border-radius: 30px;
+}
+.month-btn {
+    width: 32px; height: 32px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    color: var(--brand);
+    text-decoration: none;
+    transition: background .15s;
+}
+.month-btn:hover { background: #ddd8ff; }
+.month-label {
+    font-weight: 600;
+    color: var(--brand);
+    font-size: .9rem;
+    padding: 0 .4rem;
+    white-space: nowrap;
+}
+
+/* ── Cards ── */
+.card-app {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 1.4rem;
+    box-shadow: 0 1px 3px rgba(26, 26, 46, .04);
+}
+.card-app-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1.1rem;
+}
+.card-app-head h2 { font-size: 1.15rem; font-weight: 700; margin: 0; }
+.muted { color: var(--muted); font-size: .85rem; }
+.see-all { color: var(--brand); text-decoration: none; font-weight: 600; font-size: .9rem; }
+
+/* ── Balance hero ── */
+.balance-hero {
+    background: linear-gradient(135deg, #6C63FF, #8B83FF);
+    border-radius: 22px;
+    padding: 1.8rem;
+    color: #fff;
+    box-shadow: 0 14px 34px rgba(108, 99, 255, .32);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+.balance-label { font-size: .9rem; opacity: .85; }
+.balance-amount {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-top: .3rem;
+    color: #fff;
+}
+.balance-budget { font-size: .85rem; opacity: .8; }
+.balance-split { display: flex; gap: .8rem; align-items: center; }
+.split-item {
+    background: rgba(255, 255, 255, .15);
+    border-radius: 14px;
+    padding: .7rem .9rem;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    min-width: 130px;
+}
+.split-icon {
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+    border-radius: 9px;
+    font-size: 1rem;
+}
+.split-icon.up   { background: rgba(46,196,182,.3);  color: #d6fff8; }
+.split-icon.down { background: rgba(255,107,107,.3); color: #ffdede; }
+.split-label { display: block; font-size: .72rem; opacity: .8; }
+.split-value { display: block; font-weight: 700; font-size: 1.05rem; }
+
+/* ── Budget alert banner ── */
+.alert-budget {
+    background: #FFF0F0;
+    color: #d64545;
+    border: 1px solid #ffd6d6;
+    border-radius: 14px;
+    padding: .85rem 1.1rem;
+    margin-bottom: 1.2rem;
+    font-size: .92rem;
+    font-weight: 500;
+}
+.alert-budget i { margin-right: .4rem; }
+
+/* ── Quick actions ── */
+.quick-actions { display: flex; flex-direction: column; gap: .7rem; }
+.quick-btn {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    padding: .8rem .9rem;
+    border-radius: 13px;
+    background: #F7F7FC;
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: .95rem;
+    transition: background .15s;
+}
+.quick-btn:hover { background: #ECEAFF; }
+.quick-ico {
+    width: 36px; height: 36px;
+    display: grid; place-items: center;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 1rem;
+}
+
+/* ── Transaction list ── */
+.txn-list { display: flex; flex-direction: column; }
+.txn-row {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    padding: .8rem 0;
+    border-bottom: 1px solid var(--line);
+}
+.txn-row:last-child { border-bottom: none; }
+.txn-ico {
+    width: 44px; height: 44px;
+    display: grid; place-items: center;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    flex-shrink: 0;
+}
+.txn-main { flex: 1; min-width: 0; }
+.txn-title { display: block; font-weight: 600; color: var(--ink); font-size: .98rem; }
+.txn-meta { display: block; color: var(--muted); font-size: .82rem; }
+.txn-amount { font-weight: 700; font-size: 1.02rem; white-space: nowrap; }
+.txn-amount.income  { color: var(--income); }
+.txn-amount.expense { color: var(--expense); }
+.txn-actions { display: flex; gap: .25rem; align-items: center; }
+.icon-btn {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .15s;
+}
+.icon-btn:hover { background: #F0F0F8; color: var(--ink); }
+.icon-btn.danger:hover { background: #FFF0F0; color: var(--expense); }
+
+/* ── Toolbar ── */
+.toolbar { display: flex; gap: .8rem; margin-bottom: 1.2rem; }
+.search-form { flex: 1; }
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.search-box i {
+    position: absolute;
+    left: 1rem;
+    color: var(--muted);
+}
+.search-box input {
+    width: 100%;
+    border: none;
+    background: #fff;
+    border-radius: 13px;
+    padding: .75rem 1rem .75rem 2.6rem;
+    font-size: .95rem;
+    box-shadow: 0 1px 3px rgba(26, 26, 46, .04);
+    outline: none;
+}
+.search-box input:focus { box-shadow: 0 0 0 2px var(--brand); }
+
+/* ── Buttons ── */
+.btn-primary-app {
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    border-radius: 13px;
+    padding: .7rem 1.3rem;
+    font-weight: 600;
+    transition: background .15s;
+}
+.btn-primary-app:hover { background: var(--brand-d); color: #fff; }
+.btn-primary-app.btn-sm { padding: .5rem 1rem; font-size: .9rem; }
+
+/* ── Empty states ── */
+.empty { text-align: center; padding: 2.5rem 1rem; }
+.empty i { font-size: 2.6rem; color: #CED4DA; }
+.empty p { color: var(--muted); margin: .8rem 0; font-size: 1rem; }
+
+/* ── Forms / modals ── */
+.form-label { font-weight: 600; color: var(--ink); font-size: .88rem; margin-bottom: .35rem; }
+.form-control, .form-select {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: .65rem .9rem;
+    font-size: .95rem;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, .15);
+}
+.modal-app { border: none; border-radius: 20px; }
+.modal-app .modal-header { border-bottom: 1px solid var(--line); }
+.modal-app .modal-footer { border-top: none; }
+.modal-title { font-family: 'Poppins'; font-weight: 700; }
+
+/* ── Income/expense toggle in form ── */
+.type-toggle {
+    display: flex;
+    background: #F0F0F8;
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+}
+.type-opt { flex: 1; margin: 0; cursor: pointer; }
+.type-opt input { display: none; }
+.type-opt span {
+    display: block;
+    text-align: center;
+    padding: .6rem;
+    border-radius: 9px;
+    font-weight: 600;
+    font-size: .92rem;
+    color: var(--muted);
+    transition: all .15s;
+}
+.type-opt input:checked + span.expense { background: var(--expense); color: #fff; }
+.type-opt input:checked + span.income  { background: var(--income);  color: #fff; }
+
+/* ── Budget form ── */
+.budget-form { display: flex; gap: .7rem; flex-wrap: wrap; }
+.budget-form select { flex: 2; min-width: 160px; }
+.budget-form input  { flex: 1; min-width: 140px; }
+
+/* ── Budget cards ── */
+.budget-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.budget-card.over { border: 1.5px solid var(--expense); }
+.budget-card-top { display: flex; align-items: center; gap: .8rem; margin-bottom: 1rem; }
+.budget-card-info { flex: 1; min-width: 0; }
+.budget-cat { display: block; font-weight: 600; color: var(--ink); }
+.budget-spent { display: block; color: var(--muted); font-size: .82rem; }
+.budget-badge { font-size: .8rem; font-weight: 700; padding: .25rem .6rem; border-radius: 8px; white-space: nowrap; }
+.budget-badge.ok   { color: var(--income); background: #e6faf7; }
+.budget-badge.over { color: var(--expense); background: #FFF0F0; }
+
+/* ── Progress bars ── */
+.progress-track { background: #F0F0F8; border-radius: 6px; height: 9px; overflow: hidden; }
+.progress-track.slim { height: 6px; }
+.progress-fill { height: 100%; border-radius: 6px; transition: width .4s ease; }
+
+/* ── Reports ── */
+.donut-wrap { max-width: 280px; margin: 0 auto; }
+.donut-total { margin-top: 1.2rem; }
+.donut-amount { display: block; font-family: 'Poppins'; font-size: 1.6rem; font-weight: 800; color: var(--ink); }
+.breakdown-row { display: flex; align-items: center; gap: .9rem; padding: .7rem 0; border-bottom: 1px solid var(--line); }
+.breakdown-row:last-child { border-bottom: none; }
+.breakdown-main { flex: 1; min-width: 0; }
+.breakdown-top { display: flex; justify-content: space-between; margin-bottom: .4rem; }
+.breakdown-cat { font-weight: 600; color: var(--ink); font-size: .92rem; }
+.breakdown-amt { font-weight: 700; color: var(--ink); font-size: .92rem; }
+.breakdown-pct { color: var(--muted); font-size: .85rem; font-weight: 600; min-width: 48px; text-align: right; }
+
+/* ── Auth pages ── */
+.auth-wrap { min-height: 100vh; display: grid; place-items: center; padding: 2rem 1rem; }
+.auth-card {
+    background: #fff;
+    border-radius: 24px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 50px rgba(26, 26, 46, .1);
+}
+.auth-brand { text-align: center; margin-bottom: 1.8rem; }
+.auth-brand .brand-mark { margin: 0 auto .9rem; }
+.auth-brand h1 { font-size: 1.5rem; font-weight: 800; margin: 0; }
+.auth-brand p { color: var(--muted); margin: .3rem 0 0; }
+.auth-switch { text-align: center; margin: 1.4rem 0 0; color: var(--muted); font-size: .92rem; }
+.auth-switch a { color: var(--brand); font-weight: 600; text-decoration: none; }
+
+/* ── Flash messages ── */
+.flash-container { max-width: 960px; margin-top: 1rem; }
+.flash-container:empty { margin: 0; }
+.alert { border-radius: 13px; border: none; font-size: .92rem; }
+.alert-success { background: #e6faf7; color: #1a9c8e; }
+.alert-danger  { background: #FFF0F0; color: #d64545; }
+.alert-warning { background: #fff8e6; color: #b8860b; }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+    .balance-hero { flex-direction: column; }
+    .balance-split { width: 100%; }
+    .split-item { flex: 1; }
+    .budget-grid { grid-template-columns: 1fr; }
+    .page-title { font-size: 1.6rem; }
+    .balance-amount { font-size: 2.2rem; }
+}

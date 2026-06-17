@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% from "_month_nav.html" import month_nav %}
+{% block title %}Reports · BudgetPal{% endblock %}
+
+{% block content %}
+<div class="container page">
+
+    <div class="page-head">
+        <div>
+            <h1 class="page-title">Reports</h1>
+            <p class="page-sub">Where your money went.</p>
+        </div>
+        {{ month_nav('reports', month, year, month_name) }}
+    </div>
+
+    {% if breakdown %}
+    <div class="row g-4">
+        <!-- Donut chart -->
+        <div class="col-lg-5">
+            <div class="card-app h-100 text-center">
+                <div class="card-app-head">
+                    <h2>Spending by category</h2>
+                </div>
+                <div class="donut-wrap">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+                <div class="donut-total">
+                    <span class="muted">Total spent</span>
+                    <span class="donut-amount">${{ '%.2f'|format(total) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category breakdown list -->
+        <div class="col-lg-7">
+            <div class="card-app h-100">
+                <div class="card-app-head">
+                    <h2>Breakdown</h2>
+                </div>
+                {% for b in breakdown %}
+                <div class="breakdown-row">
+                    <span class="txn-ico" style="background: {{ b['color'] }}1a; color: {{ b['color'] }}">
+                        <i class="bi bi-tag-fill"></i>
+                    </span>
+                    <div class="breakdown-main">
+                        <div class="breakdown-top">
+                            <span class="breakdown-cat">{{ b['category'] }}</span>
+                            <span class="breakdown-amt">${{ '%.2f'|format(b['total']) }}</span>
+                        </div>
+                        <div class="progress-track slim">
+                            <div class="progress-fill" style="width: {{ b['percent'] }}%; background: {{ b['color'] }};"></div>
+                        </div>
+                    </div>
+                    <span class="breakdown-pct">{{ '%.1f'|format(b['percent']) }}%</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card-app">
+        <div class="empty">
+            <i class="bi bi-pie-chart"></i>
+            <p>No spending recorded in {{ month_name }}.</p>
+            <a href="{{ url_for('expenses') }}" class="btn btn-primary-app btn-sm">Add an expense</a>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if breakdown %}
+<script>
+fetch("{{ url_for('chart_data', month=month, year=year) }}")
+    .then(r => r.json())
+    .then(data => {
+        const ctx = document.getElementById('categoryChart');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.categories.labels,
+                datasets: [{
+                    data: data.categories.values,
+                    backgroundColor: data.categories.colors,
+                    borderWidth: 0,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                cutout: '64%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { padding: 14, font: { size: 12 } } },
+                    tooltip: { callbacks: { label: c => ' $' + c.parsed.toFixed(2) } }
+                }
+            }
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

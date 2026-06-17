@@ -1,0 +1,18 @@
+{# Reusable month navigation: prev / current / next month buttons #}
+{% macro month_nav(endpoint, month, year, month_name) %}
+{% set prev_month = month - 1 %}
+{% set prev_year = year %}
+{% if prev_month < 1 %}{% set prev_month = 12 %}{% set prev_year = year - 1 %}{% endif %}
+{% set next_month = month + 1 %}
+{% set next_year = year %}
+{% if next_month > 12 %}{% set next_month = 1 %}{% set next_year = year + 1 %}{% endif %}
+<div class="month-nav">
+    <a class="month-btn" href="{{ url_for(endpoint, month=prev_month, year=prev_year) }}">
+        <i class="bi bi-chevron-left"></i>
+    </a>
+    <span class="month-label"><i class="bi bi-calendar3"></i> {{ month_name }}</span>
+    <a class="month-btn" href="{{ url_for(endpoint, month=next_month, year=next_year) }}">
+        <i class="bi bi-chevron-right"></i>
+    </a>
+</div>
+{% endmacro %}

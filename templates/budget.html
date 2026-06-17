@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% from "_month_nav.html" import month_nav %}
+{% block title %}Budget · BudgetPal{% endblock %}
+
+{% block content %}
+<div class="container page">
+
+    <div class="page-head">
+        <div>
+            <h1 class="page-title">Budget</h1>
+            <p class="page-sub">Set limits and stay on track.</p>
+        </div>
+        {{ month_nav('budget', month, year, month_name) }}
+    </div>
+
+    <!-- Set a new budget limit (FR-03) -->
+    <div class="card-app">
+        <div class="card-app-head">
+            <h2>Set a limit</h2>
+        </div>
+        <form method="POST" action="{{ url_for('set_budget', month=month, year=year) }}" class="budget-form">
+            <select name="category" class="form-select" required>
+                <option value="" disabled selected>Choose category</option>
+                {% for c in expense_categories %}
+                <option value="{{ c['name'] }}">{{ c['name'] }}</option>
+                {% endfor %}
+            </select>
+            <input type="number" step="0.01" min="0" name="amount" class="form-control" placeholder="Monthly limit ($)" required>
+            <button type="submit" class="btn btn-primary-app">Save</button>
+        </form>
+    </div>
+
+    <!-- Budget progress cards -->
+    {% if budget_data %}
+    <div class="budget-grid mt-4">
+        {% for b in budget_data %}
+        <div class="card-app budget-card {{ 'over' if b['over'] else '' }}">
+            <div class="budget-card-top">
+                <span class="txn-ico" style="background: {{ b['color'] }}1a; color: {{ b['color'] }}">
+                    <i class="bi bi-tag-fill"></i>
+                </span>
+                <div class="budget-card-info">
+                    <span class="budget-cat">{{ b['category'] }}</span>
+                    <span class="budget-spent">
+                        ${{ '%.2f'|format(b['spent']) }} of ${{ '%.2f'|format(b['limit']) }}
+                    </span>
+                </div>
+                {% if b['over'] %}
+                <span class="budget-badge over">−${{ '%.2f'|format(b['spent'] - b['limit']) }}</span>
+                {% else %}
+                <span class="budget-badge ok">${{ '%.2f'|format(b['remaining']) }} left</span>
+                {% endif %}
+                <form method="POST" action="{{ url_for('delete_budget', budget_id=b['id']) }}"
+                      onsubmit="return confirm('Remove this budget?');">
+                    <button type="submit" class="icon-btn"><i class="bi bi-x-lg"></i></button>
+                </form>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill"
+                     style="width: {{ b['percent'] }}%;
+                            background: {% if b['percent'] < 60 %}#2EC4B6{% elif b['percent'] < 90 %}#FFBE0B{% else %}#FF6B6B{% endif %};">
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card-app mt-4">
+        <div class="empty">
+            <i class="bi bi-piggy-bank"></i>
+            <p>No budgets set for {{ month_name }}.</p>
+            <span class="muted">Add a limit above to start tracking.</span>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

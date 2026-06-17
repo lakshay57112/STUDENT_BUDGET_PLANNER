@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% from "_month_nav.html" import month_nav %}
+{% block title %}Dashboard · BudgetPal{% endblock %}
+
+{% block content %}
+<div class="container page">
+
+    <!-- Header -->
+    <div class="page-head">
+        <div>
+            <h1 class="page-title">Hi, {{ session.user_name.split()[0] }}</h1>
+            <p class="page-sub">Here's your money this month.</p>
+        </div>
+        {{ month_nav('dashboard', month, year, month_name) }}
+    </div>
+
+    <!-- Over-budget alert (FR-07) -->
+    {% if over_budget %}
+    <div class="alert-budget">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        You're over budget in {{ over_budget|length }}
+        categor{{ 'y' if over_budget|length == 1 else 'ies' }}:
+        <strong>{{ over_budget|join(', ') }}</strong>.
+    </div>
+    {% endif %}
+
+    <!-- Balance hero card -->
+    <div class="balance-hero">
+        <div class="balance-main">
+            <span class="balance-label">Balance this month</span>
+            <span class="balance-amount">${{ '%.2f'|format(balance) }}</span>
+            {% if total_budget > 0 %}
+            <span class="balance-budget">
+                Budget: ${{ '%.2f'|format(total_budget) }}
+            </span>
+            {% endif %}
+        </div>
+        <div class="balance-split">
+            <div class="split-item">
+                <span class="split-icon up"><i class="bi bi-arrow-down-left"></i></span>
+                <div>
+                    <span class="split-label">Income</span>
+                    <span class="split-value">${{ '%.2f'|format(total_income) }}</span>
+                </div>
+            </div>
+            <div class="split-item">
+                <span class="split-icon down"><i class="bi bi-arrow-up-right"></i></span>
+                <div>
+                    <span class="split-label">Spent</span>
+                    <span class="split-value">${{ '%.2f'|format(total_expense) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-1">
+        <!-- Weekly spending chart -->
+        <div class="col-lg-7">
+            <div class="card-app h-100">
+                <div class="card-app-head">
+                    <h2>This week</h2>
+                    <span class="muted">Daily spending</span>
+                </div>
+                <canvas id="weekChart" height="150"></canvas>
+            </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="col-lg-5">
+            <div class="card-app h-100">
+                <div class="card-app-head">
+                    <h2>Quick actions</h2>
+                </div>
+                <div class="quick-actions">
+                    <a href="{{ url_for('expenses') }}" class="quick-btn">
+                        <span class="quick-ico" style="background:#6C63FF"><i class="bi bi-plus-lg"></i></span>
+                        Add transaction
+                    </a>
+                    <a href="{{ url_for('budget') }}" class="quick-btn">
+                        <span class="quick-ico" style="background:#06D6A0"><i class="bi bi-piggy-bank"></i></span>
+                        Set a budget
+                    </a>
+                    <a href="{{ url_for('reports') }}" class="quick-btn">
+                        <span class="quick-ico" style="background:#FF6B6B"><i class="bi bi-pie-chart"></i></span>
+                        View reports
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent transactions -->
+    <div class="card-app mt-4">
+        <div class="card-app-head">
+            <h2>Recent</h2>
+            <a href="{{ url_for('expenses') }}" class="see-all">See all</a>
+        </div>
+
+        {% if transactions %}
+        <div class="txn-list">
+            {% for t in transactions %}
+            <div class="txn-row">
+                <span class="txn-ico" style="background: {{ category_color(t['category']) }}1a; color: {{ category_color(t['category']) }}">
+                    <i class="bi bi-tag-fill"></i>
+                </span>
+                <div class="txn-main">
+                    <span class="txn-title">{{ t['title'] }}</span>
+                    <span class="txn-meta">{{ t['category'] }} · {{ t['date'][:10] }}</span>
+                </div>
+                <span class="txn-amount {{ 'income' if t['type'] == 'income' else 'expense' }}">
+                    {{ '+' if t['type'] == 'income' else '−' }}${{ '%.2f'|format(t['amount']) }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty">
+            <i class="bi bi-receipt"></i>
+            <p>No transactions yet this month.</p>
+            <a href="{{ url_for('expenses') }}" class="btn btn-primary-app btn-sm">Add your first one</a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Fetch chart data from the backend and draw the weekly bar chart
+fetch("{{ url_for('chart_data', month=month, year=year) }}")
+    .then(r => r.json())
+    .then(data => {
+        const ctx = document.getElementById('weekChart');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.week.labels,
+                datasets: [{
+                    data: data.week.values,
+                    backgroundColor: data.week.values.map((_, i) =>
+                        i === data.week.values.length - 1 ? '#6C63FF' : '#E0DEFF'),
+                    borderRadius: 6,
+                    maxBarThickness: 36
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#F0F0F8' }, ticks: { callback: v => '$' + v } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% from "_month_nav.html" import month_nav %}
+{% block title %}Transactions · BudgetPal{% endblock %}
+
+{% block content %}
+<div class="container page">
+
+    <div class="page-head">
+        <div>
+            <h1 class="page-title">Transactions</h1>
+            <p class="page-sub">{{ transactions|length }} this month</p>
+        </div>
+        {{ month_nav('expenses', month, year, month_name) }}
+    </div>
+
+    <!-- Toolbar: search + add button -->
+    <div class="toolbar">
+        <form method="GET" action="{{ url_for('expenses') }}" class="search-form">
+            <input type="hidden" name="month" value="{{ month }}">
+            <input type="hidden" name="year" value="{{ year }}">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" name="search" value="{{ search }}" placeholder="Search transactions...">
+            </div>
+        </form>
+        <button class="btn btn-primary-app" data-bs-toggle="modal" data-bs-target="#addModal">
+            <i class="bi bi-plus-lg"></i> Add
+        </button>
+    </div>
+
+    <!-- Transaction list -->
+    <div class="card-app">
+        {% if transactions %}
+        <div class="txn-list">
+            {% for t in transactions %}
+            <div class="txn-row">
+                <span class="txn-ico" style="background: {{ category_color(t['category']) }}1a; color: {{ category_color(t['category']) }}">
+                    <i class="bi bi-tag-fill"></i>
+                </span>
+                <div class="txn-main">
+                    <span class="txn-title">{{ t['title'] }}</span>
+                    <span class="txn-meta">
+                        {{ t['category'] }} · {{ t['date'][:10] }}
+                        {% if t['note'] %} · {{ t['note'] }}{% endif %}
+                    </span>
+                </div>
+                <span class="txn-amount {{ 'income' if t['type'] == 'income' else 'expense' }}">
+                    {{ '+' if t['type'] == 'income' else '−' }}${{ '%.2f'|format(t['amount']) }}
+                </span>
+                <!-- Edit / delete buttons -->
+                <div class="txn-actions">
+                    <button class="icon-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editModal"
+                            data-id="{{ t['id'] }}"
+                            data-title="{{ t['title'] }}"
+                            data-amount="{{ t['amount'] }}"
+                            data-category="{{ t['category'] }}"
+                            data-type="{{ t['type'] }}"
+                            data-date="{{ t['date'][:10] }}"
+                            data-note="{{ t['note'] }}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <form method="POST" action="{{ url_for('delete_expense', expense_id=t['id']) }}"
+                          onsubmit="return confirm('Delete this transaction?');">
+                        <button type="submit" class="icon-btn danger"><i class="bi bi-trash"></i></button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty">
+            <i class="bi bi-receipt"></i>
+            <p>{% if search %}No transactions match "{{ search }}".{% else %}No transactions yet this month.{% endif %}</p>
+            <button class="btn btn-primary-app btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
+                Add a transaction
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ── Add Transaction Modal (FR-04) ── -->
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-app">
+            <form method="POST" action="{{ url_for('add_expense') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    {{ txn_form(expense_categories, income_categories, today) }}
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary-app w-100">Save transaction</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ── Edit Transaction Modal (FR-05) ── -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-app">
+            <form method="POST" id="editForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    {{ txn_form(expense_categories, income_categories, today, prefix='edit_') }}
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary-app w-100">Update transaction</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{# ── Reusable transaction form fields ── #}
+{% macro txn_form(expense_categories, income_categories, today, prefix='') %}
+<div class="type-toggle mb-3">
+    <label class="type-opt">
+        <input type="radio" name="type" value="expense" checked
+               onchange="document.getElementById('{{ prefix }}cat').className='form-select'">
+        <span class="expense">Expense</span>
+    </label>
+    <label class="type-opt">
+        <input type="radio" name="type" value="income">
+        <span class="income">Income</span>
+    </label>
+</div>
+<div class="mb-3">
+    <label class="form-label">Title</label>
+    <input type="text" name="title" id="{{ prefix }}title" class="form-control" placeholder="e.g. Lunch" required>
+</div>
+<div class="mb-3">
+    <label class="form-label">Amount ($)</label>
+    <input type="number" step="0.01" min="0" name="amount" id="{{ prefix }}amount" class="form-control" placeholder="0.00" required>
+</div>
+<div class="mb-3">
+    <label class="form-label">Category</label>
+    <select name="category" id="{{ prefix }}cat" class="form-select" required>
+        <optgroup label="Expense">
+            {% for c in expense_categories %}
+            <option value="{{ c['name'] }}">{{ c['name'] }}</option>
+            {% endfor %}
+        </optgroup>
+        <optgroup label="Income">
+            {% for c in income_categories %}
+            <option value="{{ c['name'] }}">{{ c['name'] }}</option>
+            {% endfor %}
+        </optgroup>
+    </select>
+</div>
+<div class="mb-3">
+    <label class="form-label">Date</label>
+    <input type="date" name="date" id="{{ prefix }}date" class="form-control" value="{{ today }}" required>
+</div>
+<div class="mb-1">
+    <label class="form-label">Note (optional)</label>
+    <input type="text" name="note" id="{{ prefix }}note" class="form-control" placeholder="Extra details">
+</div>
+{% endmacro %}
+
+{% block scripts %}
+<script>
+// Fill the edit modal with the clicked transaction's data
+const editModal = document.getElementById('editModal');
+editModal.addEventListener('show.bs.modal', e => {
+    const b = e.relatedTarget;
+    document.getElementById('editForm').action = "/expenses/edit/" + b.dataset.id;
+    document.getElementById('edit_title').value = b.dataset.title;
+    document.getElementById('edit_amount').value = b.dataset.amount;
+    document.getElementById('edit_cat').value = b.dataset.category;
+    document.getElementById('edit_date').value = b.dataset.date;
+    document.getElementById('edit_note').value = b.dataset.note;
+    // Set the correct income/expense radio
+    editModal.querySelectorAll('input[name="type"]').forEach(r => {
+        r.checked = (r.value === b.dataset.type);
+    });
+});
+</script>
+{% endblock %}
