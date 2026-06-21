@@ -650,11 +650,13 @@ def chart_data():
 # ─────────────────────────────────────────────
 #  Start the App
 # ─────────────────────────────────────────────
+import os
+
 if __name__ == "__main__":
     init_db()  # Make sure tables exist before serving
     print("=" * 50)
     print(" Student Budget Planner is running!")
-    print(" Open this in your browser:  http://127.0.0.1:5000")
-    print(" Press CTRL+C to stop the server.")
     print("=" * 50)
-    app.run(debug=True)
+
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
